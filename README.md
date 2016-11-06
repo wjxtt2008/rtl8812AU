@@ -14,29 +14,29 @@ The driver (versions) are primarily targetted at [Debian](https://www.debian.org
 
 I have currently successfully compiled the driver on Debian kernel 3.2, 3.16, 4.1-4.8 and on Raspbian with kernel 3.18, 4.1 and 4.4.
 
-## DKMS
-[DKMS](http://linux.dell.com/dkms/) is a system which will automatically recompile and install a kernel module when a new kernel gets installed or updated.
-To make use of DKMS, install the `dkms` package, which on Debian (based) systems is done like this:
-```
-# apt-get install dkms
-```
-Where '#' denotes that it should be executed as root or with sudo, but don't type that character.
+Installing
 
-To make use of the DKMS feature with this project, do the following:
-```
-# DRV_NAME=rtl8812AU
-# DRV_VERSION=4.3.14
-# mkdir /usr/src/${DRV_NAME}-${DRV_VERSION}
-# git archive driver-${DRV_VERSION} | tar -x -C /usr/src/${DRV_NAME}-${DRV_VERSION}
-# dkms add -m ${DRV_NAME} -v ${DRV_VERSION}
-# dkms build -m ${DRV_NAME} -v ${DRV_VERSION}
-# dkms install -m ${DRV_NAME} -v ${DRV_VERSION}
-```
-Whereby it is assumed you're in the cloned project directory and the current branch is `driver-4.3.14` (the default). If you want to use another driver version, adjust `DRV_VERSION` accordingly.
+Installing the driver is simply a matter of copying the built module into the correct location and updating module dependencies using depmod:
 
-If you later on want to remove it again, do the following:
-```
-# DRV_NAME=rtl8812AU
-# DRV_VERSION=4.3.14
-# dkms remove ${DRV_NAME}/${DRV_VERSION} --all
-```
+$ sudo cp 8812au.ko /lib/modules/$(uname -r)/kernel/drivers/net/wireless
+$ sudo depmod
+The driver module should now be loaded automatically.
+
+DKMS
+
+Automatically rebuilds and installs on kernel updates. DKMS is in official sources of Ubuntu, for installation do:
+
+$ sudo apt-get install build-essential dkms 
+The driver source mus be copied to /usr/src/8812au-4.3.14
+
+Then add it to DKMS:
+
+$ sudo dkms add -m 8812au -v 4.3.14
+$ sudo dkms build -m 8812au -v 4.3.14
+$ sudo dkms install -m 8812au -v 4.3.14
+Check with:
+
+$ sudo dkms status
+Eventually remove from DKMS with:
+
+$ sudo dkms remove -m 8812au -v 4.3.14 --all
